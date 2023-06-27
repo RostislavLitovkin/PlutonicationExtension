@@ -7,5 +7,6 @@ module.exports = createConfig({
   background: './src/background.ts',
   content: './src/content.ts',
   extension: './src/extension.ts',
-  page: './src/page.ts'
+  page: './src/page.ts',
+  popup: './src/popup.ts',
 });

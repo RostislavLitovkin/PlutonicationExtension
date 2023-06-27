@@ -10,7 +10,7 @@ import { chrome } from '@polkadot/extension-inject/chrome';
 const port = chrome.runtime.connect({ name: PORT_CONTENT });
 
 // send any messages from the extension back to the page
-port.onMessage.addListener((data): void => {
+port.onMessage.addListener((data: any): void => {
   window.postMessage({ ...data, origin: MESSAGE_ORIGIN_CONTENT }, '*');
 });
 
@@ -37,3 +37,16 @@ script.onload = (): void => {
 };
 
 (document.head || document.documentElement).appendChild(script);
+
+window.addEventListener('message', async ({ data }: Message): Promise<void> => {
+  if (data.response === "OPEN_POPUP") {
+
+    chrome.runtime.sendMessage({
+      message: "open_popup",
+      url: "wss://plutonication-53tvi.ondigitalocean.app/plutonication",
+      key: 1,
+      name: data.origin
+    });
+  }
+});
+

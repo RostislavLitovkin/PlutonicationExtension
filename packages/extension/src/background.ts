@@ -19,6 +19,39 @@ import { cryptoWaitReady } from '@polkadot/util-crypto';
 // setup the notification (same a FF default background, white text)
 withErrorLog(() => chrome.browserAction.setBadgeBackgroundColor({ color: '#d90000' }));
 
+let faviconUrl: string = ""
+
+async function waitForFavicon(): Promise<string> {
+  while (faviconUrl === "") {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  return faviconUrl
+}
+
+chrome.runtime.onMessage.addListener(async function (request, _sender, _sendResponse) {
+  if (request.message === "open_popup") {
+
+    faviconUrl = ""
+    await chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      let tab = tabs[0];
+      faviconUrl = tab.favIconUrl || "none";
+    });
+
+    let popupURL = chrome.runtime.getURL("index.html") +
+      `?key=${encodeURIComponent(request.key)}` +
+      `&name=${encodeURIComponent(request.name)}` +
+      `&icon=${encodeURIComponent(await waitForFavicon())}` +
+      `&url=${encodeURIComponent(request.url)}`;
+
+    chrome.windows.create({
+      url: popupURL,
+      type: "popup",
+      width: 300,
+      height: 400
+    });
+  }
+});
+
 // listen to all messages and handle appropriately
 chrome.runtime.onConnect.addListener((port): void => {
   // shouldn't happen, however... only listen to what we know about
@@ -29,7 +62,7 @@ chrome.runtime.onConnect.addListener((port): void => {
   port.onDisconnect.addListener(() => console.log(`Disconnected from ${port.name}`));
 });
 
-function getActiveTabs () {
+function getActiveTabs() {
   // queriing the current active tab in the current window should only ever return 1 tab
   // although an array is specified here
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {

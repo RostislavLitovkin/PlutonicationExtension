@@ -1,23 +1,22 @@
 {
-  "author": "polkadot.{js}",
+  "author": "Rostislav Litovkin & Dušan Jánsky",
   "description": "Manage your Polkadot accounts outside of dapps. Injects the accounts and allows signing transactions for a specific account.",
   "homepage_url": "https://github.com/polkadot-js/extension",
-  "name": "polkadot{.js} extension",
-  "short_name": "polkadot{.js}",
+  "name": "Plutonication extension (polkadot.js)",
+  "short_name": "Plutonication extension (polkadot.js)",
   "manifest_version": 2,
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "<all_urls>"],
   "background": {
     "scripts": ["background.js"],
     "persistent": true
   },
   "browser_action": {
-    "default_title": "polkadot{.js}",
+    "default_title": "Plutonication extension",
     "default_popup": "index.html"
   },
   "content_scripts": [{
     "js": ["content.js"],
-    "matches": ["http://*/*", "https://*/*"],
-    "run_at": "document_start"
+    "matches": ["http://*/*", "https://*/*"]
   }],
   "icons": {
     "16": "images/icon-16.png",
