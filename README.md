@@ -145,3 +145,4 @@ Accounts can also be derived from existing accounts – `Derive New Account` opt
 ```
 
 The path will be added to the mnemonic phrase of the parent account.
+# extension
