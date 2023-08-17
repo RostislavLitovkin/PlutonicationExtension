@@ -10,12 +10,15 @@ import { injectExtension } from '@polkadot/extension-inject';
 
 import { packageInfo } from './packageInfo.js';
 import type { Injected, InjectedAccount, Unsubcall } from '@polkadot/extension-inject/types';
+import type { SignerPayloadJSON, SignerPayloadRaw } from '@polkadot/types/types';
 
 import { io } from "socket.io-client"
+import type { SignerResult } from '@polkadot/api/types/index.js';
+import type { HexString } from "@polkadot/util/types"
 
-
+const plutonicationUrl = "wss://plutonication-53tvi.ondigitalocean.app/plutonication" // "ws://0.0.0.0:8050/plutonication" 
 // Connect to your server
-var socket = io('wss://plutonication-53tvi.ondigitalocean.app/plutonication');
+const socket = io(plutonicationUrl);
 
 // Listen to an event
 socket.on('receivepubkey', function (data) {
@@ -24,7 +27,14 @@ socket.on('receivepubkey', function (data) {
 
 // Listen to an event
 socket.on('message', function (data) {
+  console.log("This message has been received:")
   console.log(data);
+});
+
+socket.on('signed_payload', function (data) {
+  console.log("signed_payload: ")
+  console.log(data.signature)
+  signature = data.signature
 });
 
 function inject() {
@@ -34,25 +44,28 @@ function inject() {
   });
 }
 
-let pubkey: string
+let pubkey: string = ""
 
 async function waitForPubkey(): Promise<string> {
-  while (!pubkey) {
+  pubkey = ""
+  while (pubkey === "") {
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
+  console.log("New pubkey: " + pubkey);
   return pubkey
 }
 
+let signature: HexString = "0x"
+
+async function waitForSignature(): Promise<HexString> {
+  signature = "0x"
+  while (signature === "0x") {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+  return signature
+}
+
 export async function enable(origin: string): Promise<Injected> {
-  console.log("Initializing plutonication on: " + origin);
-
-  
-
-  window.postMessage({
-    response: "OPEN_POPUP",
-    origin
-    // other data properties...
-  }, "*");
 
   const injected: Injected = {
     accounts: {
@@ -62,8 +75,6 @@ export async function enable(origin: string): Promise<Injected> {
           address: await waitForPubkey()
         }
 
-        console.log("Pubkey received: " + account.address)
-
         return [account]
 
       },
@@ -72,9 +83,50 @@ export async function enable(origin: string): Promise<Injected> {
       }
     },
     signer: {
+      signPayload: async (payloadJson: SignerPayloadJSON): Promise<SignerResult> => {
 
+        socket.emit("sign_payload", { Data: payloadJson })
+
+        const result: SignerResult = {
+          /**
+           * @description The id for this request
+           */
+          id: 0,
+          /**
+           * @description The resulting signature in hex
+           */
+          signature: await waitForSignature()
+        }
+
+        return result;
+      },
+      signRaw: async (raw: SignerPayloadRaw): Promise<SignerResult> => {
+        socket.emit("sign_raw", { Data: raw })
+
+        const result: SignerResult = {
+          /**
+           * @description The id for this request
+           */
+          id: 0,
+          /**
+           * @description The resulting signature in hex
+           */
+          signature: await waitForSignature()
+        }
+
+        return result;
+      }
     }
   }
+
+  // open the popup
+  window.postMessage({
+    response: "OPEN_POPUP",
+    origin,
+    plutonicationUrl
+    // other data properties...
+  }, "*");
+
   return injected;
 }
 

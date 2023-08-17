@@ -1,8 +1,6 @@
 // Copyright 2019-2023 @polkadot/extension authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Message } from '@polkadot/extension-base/types';
-
 import { MESSAGE_ORIGIN_CONTENT, MESSAGE_ORIGIN_PAGE, PORT_CONTENT } from '@polkadot/extension-base/defaults';
 import { chrome } from '@polkadot/extension-inject/chrome';
 
@@ -38,12 +36,23 @@ script.onload = (): void => {
 
 (document.head || document.documentElement).appendChild(script);
 
+interface Message extends MessageEvent {
+  data: {
+    error?: string;
+    id: string;
+    origin: string;
+    response?: string;
+    subscription?: string;
+    plutonicationUrl?: string;
+  }
+}
+
 window.addEventListener('message', async ({ data }: Message): Promise<void> => {
   if (data.response === "OPEN_POPUP") {
 
     chrome.runtime.sendMessage({
       message: "open_popup",
-      url: "wss://plutonication-53tvi.ondigitalocean.app/plutonication",
+      url: data.plutonicationUrl,
       key: 1,
       name: data.origin
     });
