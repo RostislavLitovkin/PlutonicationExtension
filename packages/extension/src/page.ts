@@ -45,6 +45,7 @@ function inject() {
 }
 
 let pubkey: string = ""
+let roomKey: string = ""
 
 async function waitForPubkey(): Promise<string> {
   pubkey = ""
@@ -85,7 +86,7 @@ export async function enable(origin: string): Promise<Injected> {
     signer: {
       signPayload: async (payloadJson: SignerPayloadJSON): Promise<SignerResult> => {
 
-        socket.emit("sign_payload", { Data: payloadJson })
+        socket.emit("sign_payload", { Data: payloadJson, Room: roomKey })
 
         const result: SignerResult = {
           /**
@@ -101,7 +102,7 @@ export async function enable(origin: string): Promise<Injected> {
         return result;
       },
       signRaw: async (raw: SignerPayloadRaw): Promise<SignerResult> => {
-        socket.emit("sign_raw", { Data: raw })
+        socket.emit("sign_raw", { Data: raw, Room: roomKey })
 
         const result: SignerResult = {
           /**
@@ -119,9 +120,15 @@ export async function enable(origin: string): Promise<Injected> {
     }
   }
 
+  // set new roomKey
+  roomKey = Date.now().toString()
+
+  socket.emit("create_room", { Data: "Nothing here", Room: roomKey })
+
   // open the popup
   window.postMessage({
     response: "OPEN_POPUP",
+    roomKey,
     origin,
     plutonicationUrl
     // other data properties...

@@ -44,6 +44,7 @@ interface Message extends MessageEvent {
     response?: string;
     subscription?: string;
     plutonicationUrl?: string;
+    roomKey: number;
   }
 }
 
@@ -53,9 +54,8 @@ window.addEventListener('message', async ({ data }: Message): Promise<void> => {
     chrome.runtime.sendMessage({
       message: "open_popup",
       url: data.plutonicationUrl,
-      key: 1,
+      key: data.roomKey,
       name: data.origin
     });
   }
 });
-
