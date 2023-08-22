@@ -23,5 +23,3 @@ Everything by that point is automatic.
     - click on "Load Temporary Add-on" and point to `packages/extension/build/manifest.json`
     - if developing, after making changes - reload the extension
 3. When visiting `https://polkadot.js.org/apps/` it will inject the extension
-
-Once added, you can create an account (via a generated seed) or import via an existing seed. The [apps UI](https://github.com/polkadot-js/apps/), when loaded, will show these accounts as `<account name> (extension)`
