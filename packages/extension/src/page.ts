@@ -16,7 +16,7 @@ import { io } from "socket.io-client"
 import type { SignerResult } from '@polkadot/api/types/index.js';
 import type { HexString } from "@polkadot/util/types"
 
-const plutonicationUrl = "wss://plutonication-53tvi.ondigitalocean.app/plutonication" // "ws://0.0.0.0:8050/plutonication" 
+const plutonicationUrl = "wss://plutonication-acnha.ondigitalocean.app" // "ws://0.0.0.0:8050/plutonication" 
 // Connect to your server
 const socket = io(plutonicationUrl);
 
