@@ -21,7 +21,7 @@ const plutonicationUrl = "wss://plutonication-acnha.ondigitalocean.app" // "ws:/
 const socket = io(plutonicationUrl);
 
 // Listen to an event
-socket.on('receivepubkey', function (data) {
+socket.on('pubkey', function (data) {
   pubkey = data
 });
 
@@ -31,7 +31,13 @@ socket.on('message', function (data) {
   console.log(data);
 });
 
-socket.on('signed_payload', function (data) {
+socket.on('payload_signature', function (data) {
+  console.log("signed_payload: ")
+  console.log(data.signature)
+  signature = data.signature
+});
+
+socket.on('raw_signature', function (data) {
   console.log("signed_payload: ")
   console.log(data.signature)
   signature = data.signature
@@ -123,7 +129,7 @@ export async function enable(origin: string): Promise<Injected> {
   // set new roomKey
   roomKey = Date.now().toString()
 
-  socket.emit("create_room", { Data: "Nothing here", Room: roomKey })
+  socket.emit("create_room", { Room: roomKey })
 
   // open the popup
   window.postMessage({
